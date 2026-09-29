@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Día de los Carritos de Hot Wheels</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: #030814;
+      color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* =========================
+       FONDO DE ESTRELLAS
+    ========================= */
+
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle var(--duration) infinite ease-in-out;
+    }
+
+    @keyframes twinkle {
+      0%, 100% {
+        opacity: 0.2;
+        transform: scale(0.8);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.2);
+      }
+    }
+
+    /* =========================
+       LUNA
+    ========================= */
+
+    .moon {
+      position: absolute;
+      top: 30px;
+      right: 40px;
+      width: 50px;
+      height: 50px;
+      background: #e2f1ff;
+      border-radius: 50%;
+      box-shadow:
+        0 0 20px #82c3ff,
+        0 0 40px #4182e4;
+      z-index: 2;
+    }
+
+    /* =========================
+       PANTALLA DE CARGA
+    ========================= */
+
+    #loader-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+
+      background: #030814;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      z-index: 100;
+
+      transition:
+        opacity 1s ease,
+        visibility 1s ease;
+    }
+
+    .loader-title {
+      font-size: 1.8rem;
+      font-weight: bold;
+
+      color: #64b5f6;
+
+      text-shadow: 0 0 10px #2196f3;
+
+      margin-bottom: 40px;
+
+      text-align: center;
+    }
+
+    .progress-container {
+      width: 280px;
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 8px;
+
+      background: rgba(255, 255, 255, 0.2);
+
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      width: 0%;
+      height: 100%;
+
+      background: #42a5f5;
+
+      box-shadow: 0 0 10px #1e88e5;
+
+      transition: width 0.05s linear;
+    }
+
+    /* Auto en la barra */
+
+    .car-icon {
+      position: absolute;
+      top: -18px;
+      left: 0%;
+
+      transform: translateX(-50%);
+
+      font-size: 20px;
+
+      transition: left 0.05s linear;
+    }
+
+    .percentage {
+      font-size: 1.5rem;
+
+      color: #90caf9;
+
+      font-weight: bold;
+
+      text-shadow: 0 0 8px #1e88e5;
+    }
+
+    /* =========================
+       CONTENIDO PRINCIPAL
+    ========================= */
+
+    #main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      z-index: 10;
+
+      opacity: 0;
+
+      transition: opacity 1.5s ease;
+
+      padding: 20px;
+
+      width: 100%;
+      max-width: 500px;
+
+      text-align: center;
+    }
+
+    .main-title {
+      font-size: 1.8rem;
+
+      color: #90caf9;
+
+      text-shadow:
+        0 0 12px #1976d2,
+        0 0 20px #0d47a1;
+
+      margin-top: 40px;
+      margin-bottom: 10px;
+
+      line-height: 1.3;
+    }
+
+    /* =========================
+       RAMO DE TULIPANES
+    ========================= */
+
+    .bouquet-container {
+      margin: 5px 0 10px;
+
+      position: relative;
+
+      width: 280px;
+      height: 300px;
+
+      animation: bouquetFloat 4s ease-in-out infinite;
+    }
+
+    .bouquet-container svg {
+      width: 100%;
+      height: 100%;
+
+      overflow: visible;
+
+      filter:
+        drop-shadow(
+          0 0 10px rgba(33, 150, 243, 0.35)
+        );
+    }
+
+    @keyframes bouquetFloat {
+
+      0%, 100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-7px);
+      }
+
+    }
+
+/* =========================
+   ANIMACIÓN DE TULIPANES
+========================= */
+
+.bouquet-container {
+  margin: 5px 0 10px;
+  position: relative;
+  width: 280px;
+  height: 300px;
+
+  animation: bouquetFloat 4s ease-in-out infinite;
+}
+
+.bouquet-container svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+
+  filter: drop-shadow(
+    0 0 10px rgba(33, 150, 243, 0.35)
+  );
+}
+
+@keyframes bouquetFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-7px);
+  }
+}
+    /* =========================
+       TARJETA INTERACTIVA
+    ========================= */
+
+    .card {
+      background:
+        linear-gradient(
+          135deg,
+          rgba(16, 32, 66, 0.9),
+          rgba(5, 15, 38, 0.9)
+        );
+
+      border: 1px solid #2196f3;
+
+      box-shadow:
+        0 0 15px rgba(33, 150, 243, 0.4);
+
+      border-radius: 15px;
+
+      padding: 20px;
+
+      width: 90%;
+
+      margin-top: 5px;
+
+      cursor: pointer;
+
+      transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+
+      box-shadow:
+        0 0 25px rgba(33, 150, 243, 0.7);
+    }
+
+    .card-header {
+      font-weight: bold;
+
+      color: #64b5f6;
+
+      font-size: 1.1rem;
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: center;
+    }
+
+    .card-body {
+      max-height: 0;
+
+      overflow: hidden;
+
+      transition:
+        max-height 0.5s ease,
+        padding 0.3s ease;
+
+      text-align: left;
+
+      font-size: 0.95rem;
+
+      color: #e0e0e0;
+
+      line-height: 1.5;
+    }
+
+    .card.open .card-body {
+      max-height: 200px;
+
+      padding-top: 15px;
+    }
+
+    /* =========================
+       PASTO
+    ========================= */
+
+    .grass {
+      position: fixed;
+
+      bottom: 0;
+      left: 0;
+
+      width: 100%;
+      height: 60px;
+
+      background:
+        linear-gradient(
+          to top,
+          #022008,
+          transparent
+        );
+
+      z-index: 2;
+
+      pointer-events: none;
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 500px) {
+
+      .moon {
+        width: 38px;
+        height: 38px;
+
+        top: 20px;
+        right: 20px;
+      }
+
+      .main-title {
+        font-size: 1.55rem;
+      }
+
+      .bouquet-container {
+        width: 250px;
+        height: 270px;
+      }
+
+      .card {
+        width: 95%;
+      }
+
+      .loader-title {
+        font-size: 1.5rem;
+      }
+
+      .progress-container {
+        width: 240px;
+      }
+
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- =========================
+       FONDO
+  ========================= -->
+
+  <div class="stars" id="stars"></div>
+
+  <div class="moon"></div>
+
+  <div class="grass"></div>
+
+
+  <!-- =========================
+       PANTALLA DE CARGA
+  ========================= -->
+
+  <div id="loader-screen">
+
+    <div class="loader-title">
+      Cargando tu ramo de<br>
+      Hot Wheels...
+    </div>
+
+    <div class="progress-container">
+
+      <div class="car-icon" id="car">
+        🏎️
+      </div>
+
+      <div class="progress-bar-bg">
+
+        <div
+          class="progress-bar-fill"
+          id="progress-fill">
+        </div>
+
+      </div>
+
+    </div>
+
+    <div
+      class="percentage"
+      id="percentage">
+      0%
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       CONTENIDO
+  ========================= -->
+
+  <div id="main-content">
+
+    <h1 class="main-title">
+      Toma tu Ramito de<br>
+       Hot Wheels
+    </h1>
+
+
+    <!-- =========================
+         RAMO DE TULIPANES
+    ========================= -->
+
+    <div class="bouquet-container">
+
+      <svg
+        viewBox="0 0 240 260"
+        xmlns="http://www.w3.org/2000/svg">
+
+        <!-- =====================
+             TALLOS
+        ====================== -->
+
+        <path
+          d="M120 235 Q105 175 75 105"
+          stroke="#238b45"
+          stroke-width="6"
+          fill="none"
+          stroke-linecap="round"
+        />
+
+        <path
+          d="M120 235 Q120 170 120 85"
+          stroke="#238b45"
+          stroke-width="6"
+          fill="none"
+          stroke-linecap="round"
+        />
+
+        <path
+          d="M120 235 Q135 175 165 105"
+          stroke="#238b45"
+          stroke-width="6"
+          fill="none"
+          stroke-linecap="round"
+        />
+
+        <path
+          d="M120 235 Q90 185 55 145"
+          stroke="#238b45"
+          stroke-width="5"
+          fill="none"
+          stroke-linecap="round"
+        />
+
+        <path
+          d="M120 235 Q150 185 185 145"
+          stroke="#238b45"
+          stroke-width="5"
+          fill="none"
+          stroke-linecap="round"
+        />
+
+
+        <!-- =====================
+             HOJAS
+        ====================== -->
+
+        <path
+          d="M100 195
+             Q65 175 48 145
+             Q82 150 105 175 Z"
+          fill="#35a854"
+        />
+
+        <path
+          d="M140 195
+             Q175 175 192 145
+             Q158 150 135 175 Z"
+          fill="#35a854"
+        />
+
+        <path
+          d="M105 165
+             Q75 140 70 115
+             Q98 130 112 150 Z"
+          fill="#43b85c"
+        />
+
+        <path
+          d="M135 165
+             Q165 140 170 115
+             Q142 130 128 150 Z"
+          fill="#43b85c"
+        />
+
+
+        <!-- =====================
+             TULIPÁN IZQUIERDO
+        ====================== -->
+
+        <g
+          class="tulip"
+          transform="translate(75,105)">
+
+          <path
+            d="
+              M-27 0
+              Q-30 -25 -18 -43
+              Q-10 -30 0 -48
+              Q10 -30 18 -43
+              Q30 -25 27 0
+              Q20 20 0 24
+              Q-20 20 -27 0
+              Z
+            "
+            fill="#42a5f5"
+            stroke="#90caf9"
+            stroke-width="2"
+            filter="drop-shadow(0 0 6px #2196f3)"
+          />
+
+          <path
+            d="M-18 -4 Q0 10 18 -4"
+            stroke="#1976d2"
+            stroke-width="3"
+            fill="none"
+            opacity="0.8"
+          />
+
+        </g>
+
+
+        <!-- =====================
+             TULIPÁN CENTRAL
+        ====================== -->
+
+        <g
+          class="tulip"
+          transform="translate(120,85)">
+
+          <path
+            d="
+              M-31 0
+              Q-34 -30 -20 -52
+              Q-10 -35 0 -58
+              Q10 -35 20 -52
+              Q34 -30 31 0
+              Q24 24 0 28
+              Q-24 24 -31 0
+              Z
+            "
+            fill="#2196f3"
+            stroke="#90caf9"
+            stroke-width="2"
+            filter="drop-shadow(0 0 8px #2196f3)"
+          />
+
+          <path
+            d="M-20 -5 Q0 12 20 -5"
+            stroke="#0d47a1"
+            stroke-width="3"
+            fill="none"
+            opacity="0.8"
+          />
+
+        </g>
+
+
+        <!-- =====================
+             TULIPÁN DERECHO
+        ====================== -->
+
+        <g
+          class="tulip"
+          transform="translate(165,105)">
+
+          <path
+            d="
+              M-27 0
+              Q-30 -25 -18 -43
+              Q-10 -30 0 -48
+              Q10 -30 18 -43
+              Q30 -25 27 0
+              Q20 20 0 24
+              Q-20 20 -27 0
+              Z
+            "
+            fill="#42a5f5"
+            stroke="#90caf9"
+            stroke-width="2"
+            filter="drop-shadow(0 0 6px #2196f3)"
+          />
+
+          <path
+            d="M-18 -4 Q0 10 18 -4"
+            stroke="#1976d2"
+            stroke-width="3"
+            fill="none"
+            opacity="0.8"
+          />
+
+        </g>
+
+
+        <!-- =====================
+             TULIPÁN PEQUEÑO IZQUIERDO
+        ====================== -->
+
+        <g
+          class="tulip"
+          transform="translate(55,145) scale(.72)">
+
+          <path
+            d="
+              M-27 0
+              Q-30 -25 -18 -43
+              Q-10 -30 0 -48
+              Q10 -30 18 -43
+              Q30 -25 27 0
+              Q20 20 0 24
+              Q-20 20 -27 0
+              Z
+            "
+            fill="#64b5f6"
+            stroke="#bbdefb"
+            stroke-width="2"
+            filter="drop-shadow(0 0 5px #42a5f5)"
+          />
+
+        </g>
+
+
+        <!-- =====================
+             TULIPÁN PEQUEÑO DERECHO
+        ====================== -->
+
+        <g
+          class="tulip"
+          transform="translate(185,145) scale(.72)">
+
+          <path
+            d="
+              M-27 0
+              Q-30 -25 -18 -43
+              Q-10 -30 0 -48
+              Q10 -30 18 -43
+              Q30 -25 27 0
+              Q20 20 0 24
+              Q-20 20 -27 0
+              Z
+            "
+            fill="#64b5f6"
+            stroke="#bbdefb"
+            stroke-width="2"
+            filter="drop-shadow(0 0 5px #42a5f5)"
+          />
+
+        </g>
+
+      </svg>
+
+    </div>
+
+
+    <!-- =========================
+         TARJETA
+    ========================= -->
+
+    <div
+      class="card"
+      onclick="toggleCard(this)">
+
+      <div class="card-header">
+
+        <span>
+          💌 Un detalle para ti...
+        </span>
+
+        <span id="arrow">
+          ▼
+        </span>
+
+      </div>
+
+      <div class="card-body">
+
+        <p>
+          ¡Virtuales!
+          Para que Hoy no seas espectador.
+          Te quiero muchísimo. ❤️🏎️💨
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       JAVASCRIPT
+  ========================= -->
+
+  <script>
+
+    /* =========================
+       GENERAR ESTRELLAS
+    ========================= */
+
+    const starsContainer =
+      document.getElementById('stars');
+
+    for (let i = 0; i < 60; i++) {
+
+      const star =
+        document.createElement('div');
+
+      star.className = 'star';
+
+      star.style.width =
+        `${Math.random() * 3 + 1}px`;
+
+      star.style.height =
+        star.style.width;
+
+      star.style.top =
+        `${Math.random() * 100}%`;
+
+      star.style.left =
+        `${Math.random() * 100}%`;
+
+      star.style.setProperty(
+        '--duration',
+        `${Math.random() * 3 + 1.5}s`
+      );
+
+      starsContainer.appendChild(star);
+    }
+
+
+    /* =========================
+       ANIMACIÓN DE CARGA
+    ========================= */
+
+    let progress = 0;
+
+    const progressFill =
+      document.getElementById('progress-fill');
+
+    const car =
+      document.getElementById('car');
+
+    const percentage =
+      document.getElementById('percentage');
+
+    const loaderScreen =
+      document.getElementById('loader-screen');
+
+    const mainContent =
+      document.getElementById('main-content');
+
+
+    const interval = setInterval(() => {
+
+      progress += 1;
+
+      progressFill.style.width =
+        `${progress}%`;
+
+      car.style.left =
+        `${progress}%`;
+
+      percentage.textContent =
+        `${progress}%`;
+
+
+      if (progress >= 100) {
+
+        clearInterval(interval);
+
+        setTimeout(() => {
+
+          loaderScreen.style.opacity = '0';
+
+          setTimeout(() => {
+
+            loaderScreen.style.display =
+              'none';
+
+            mainContent.style.opacity =
+              '1';
+
+          }, 1000);
+
+        }, 300);
+
+      }
+
+    }, 30);
+
+
+    /* =========================
+       TARJETA INTERACTIVA
+    ========================= */
+
+    function toggleCard(card) {
+
+      card.classList.toggle('open');
+
+      const arrow =
+        document.getElementById('arrow');
+
+      if (card.classList.contains('open')) {
+
+        arrow.textContent = '▲';
+
+      } else {
+
+        arrow.textContent = '▼';
+
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>
